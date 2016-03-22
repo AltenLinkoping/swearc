@@ -1,0 +1,113 @@
+================================================================================
+
+       ____            _       _   ____            _                  _
+      / ___|  ___ _ __(_) __ _| | |  _ \ _ __ ___ | |_ ___   ___ ___ | |
+      \___ \ / _ \ '__| |/ _` | | | |_) | '__/ _ \| __/ _ \ / __/ _ \| |
+       ___) |  __/ |  | | (_| | | |  __/| | | (_) | || (_) | (_| (_) | |
+      |____/ \___|_|  |_|\__,_|_| |_|   |_|  \___/ \__\___/ \___\___/|_|
+
+                                 Version specification 0.1
+
+================================================================================
+
+This document describes the exchange format used between the Arduino and Android
+devices.
+
+1. Message format
+
+The overall structure of a message looks like this (size in parenthesis):
+
+   +-----------+---------+----------+-------------------------+----------+
+   | Magic (1) | Seq (1) | Size (1) | 0-N messages ([0, 124]) | CRC8 (1) |
+   +-----------+---------+----------+----------------.--------+----------+
+
+An inner message looks like this (size in parenthesis):
+
+   +----------+----------+
+   | Type (1) | Data (n) |
+   +----------+----------+
+
+In general, the following should be assumed:
+
+   * Magic is set to 0xA3 and indicates the start of a message
+   * Network byte order (big endian)
+   * Unsigned types unless otherwise specified
+   * No message can be longer than 128, including headers
+   * Size should only include length of messages (max 124)
+   * Seq starts at 0 and wraps back to 0 after 255
+   * A message cannot be processed before CRC has been verified
+
+1.1. Error management
+
+A message should be ignored if any of the following conditions are met:
+
+   * Type is unknown
+   * Size > 124
+   * Size and received data is inconsistent
+   * CRC8 does not match
+
+1.2. Sequence numbers
+
+The protocol does not support re-sending of messages, but includes a sequence
+field to give the receiver a possibility to handle missing messages. This
+specification does not specify nor enforce any method of handling missing
+messages. It is fully upp to the receiver.
+
+1.3. Data types
+
+Supported data types and sizes:
+
+   * uint8_t - 1 byte
+   * bool    - 1 byte
+
+1.4. Inner message format
+
+An inner message can be explained using the following format:
+
+   Data: <servo id : uint8_t>
+         <position : uint8_t>
+
+The interpretation should be that the message contains two fields, servo id and
+position. Each field is 1 byte since uint8_t is specified. The field order must
+match the serialized order.
+
+================================================================================
+
+2. Inner message definitions
+
+This chapter defines all the inner messages.
+
+2.1. Set servo position (absolute)
+
+Type: 0x00
+Data: <servo id : uint8_t>
+      <position : uint8_t>
+
+Restrictions: <servo id>: according to number of available servos
+              <position>: 0-180 degrees
+
+Moves a servo to an absolute position.
+
+2.2. Engine forward
+
+Type: 0x01
+Data: <engine id : uint8_t>
+      <speed     : uint8_t>
+
+Restrictions: <engine id>: according to number of available engines
+              <speed>    : 0-255
+
+Turns an engine on with a specified speed.
+
+2.3. Engine backward
+
+Type: 0x01
+Data: <engine id : uint8_t>
+      <speed     : uint8_t>
+
+Restrictions: <engine id>: according to number of available engines
+              <speed>    : 0-255
+
+Turns an engine on in the opposite direction with a specified speed.
+
+================================================================================

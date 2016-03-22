@@ -1,0 +1,3 @@
+Place arduino code in src/
+
+Libraries from 3rd party should be placed in libraries.
