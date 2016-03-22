@@ -5,6 +5,8 @@ import org.gradle.internal.os.OperatingSystem;
 if (!project.hasProperty('arduinoDir')) {
    if (OperatingSystem.current().isMacOsX()) {
      ext.arduinoDir = "/Applications/Arduino.app/Contents/Java"
+   } else if (OperatingSystem.current().isWindows()) {
+     ext.arduinoDir = "C:\\Arduino"
    } else {
      throw new GradleException("Unsupported operating system - add it to arduino.gradle")
    }
