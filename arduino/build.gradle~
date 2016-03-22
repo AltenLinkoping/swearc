@@ -1,7 +1,0 @@
-apply from: 'arduino.gradle'
-ext.sketchMainFile = "robot.ino"
-
-ext.core = "arduino"       // Run 'gradle listCores' to see all available
-ext.variant = "mega"       // Run 'gradle listVariants' to see all available
-ext.cpuName = "atmega2560" // Define the microcontroler used on the board (UNO: atmega328p)
-ext.cpuClock = "16000000L" // Define the clock speed on the board
