@@ -7,6 +7,8 @@ if (!project.hasProperty('arduinoDir')) {
      ext.arduinoDir = "/Applications/Arduino.app/Contents/Java"
    } else if (OperatingSystem.current().isWindows()) {
      ext.arduinoDir = "C:\\Arduino"
+   } else if (OperatingSystem.current().isLinux()) {
+     ext.arduinoDir = "/usr/bin/arduino" // Or is it "/usr/bin/arduino" ?
    } else {
      throw new GradleException("Unsupported operating system - add it to arduino.gradle")
    }
