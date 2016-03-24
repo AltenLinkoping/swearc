@@ -13,7 +13,7 @@ import org.java_websocket.server.WebSocketServer;
 
 import se.alten.swearc.logging.LogMessage;
 
-public class LogWebsocketServer extends WebSocketServer {
+class LogWebsocketServer extends WebSocketServer {
 
 	Collection<WebSocket> loggerSockets = new LinkedList<WebSocket>();
 
