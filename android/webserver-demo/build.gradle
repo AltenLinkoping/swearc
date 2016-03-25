@@ -4,7 +4,6 @@ apply plugin: 'eclipse'
 
 apply plugin: 'application'
 
-
 repositories {
     mavenCentral()
 }
@@ -21,6 +20,6 @@ sourceCompatibility = 8
 
 version = '0.1'
 
-// mainClassName = "se.alten.swearc.webserver.dummy.Main"
+mainClassName = "se.alten.swearc.webserver.dummy.Main"
 
 

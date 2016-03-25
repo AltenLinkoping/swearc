@@ -3,7 +3,7 @@
 
 This is a proof-of-concept server with dummy generator for logging.
 
-See [Webserver](../webserver/)
+See [Webserver](../webserver/) for more details and instructions.
 
 
 # How to test

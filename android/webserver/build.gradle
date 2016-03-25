@@ -2,13 +2,9 @@ apply plugin: 'java'
 
 apply plugin: 'eclipse'
 
-apply plugin: 'application'
-
-
 repositories {
     mavenCentral()
 }
-
 
 dependencies {
     compile group: 'org.nanohttpd', name: 'nanohttpd', version: '2.2.0' 

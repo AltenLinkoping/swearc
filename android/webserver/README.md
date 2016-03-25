@@ -17,6 +17,6 @@ There is a gradle task 'eclipse' to generate a Eclipse project for this project.
 
 # How to include into other projects
 
-See hot it is done in the [Webserver demo](../webserver-demo/).
+See how it is done in the [Webserver demo](../webserver-demo/).
 
 
