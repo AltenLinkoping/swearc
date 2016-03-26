@@ -40,6 +40,8 @@ Start Android SDK Manager (android in tools directory) and install at least:
    * Android Support Library
    * Google Repository
 
+Make sure $ANDROID_HOME points to your SDK installation.
+
 3. Install JDK 1.8
 
 Go to:
