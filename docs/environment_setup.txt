@@ -1,0 +1,58 @@
+Instructions for setting up the development environment
+=======================================================
+
+Short version:
+
+   1. Arduino IDE -> http://www.arduino.org/software
+   2. Android SDK -> http://developer.android.com/sdk/index.html
+     2.1. ./tools/android -> SDK Built-tools 23.0.2
+                             Android 5.1.1 (22)
+			     Android Support Library
+			     Google Repository
+   3. JDK 1.8     -> http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+
+Long version:
+
+1. Install Arduino IDE
+
+Go to:
+
+   http://www.arduino.org/software
+
+and install the correct version for your OS.
+
+Hopefully the build system will find it automatically (detection is performed
+at the top of arduino/arduino.gradle). If you have installed it somewhere else,
+just point arduinoDir in arduino/gradle.properties to your installation.
+
+2. Install Android SDK
+
+Go to:
+
+   http://developer.android.com/sdk/index.html
+
+install the correct SDK for your OS. Make sure ANDROID_HOME points to the SDK.
+
+Start Android SDK Manager (android in tools directory) and install at least:
+
+   * Android SDK Build-tools 23.0.2
+   * Android 5.1.1 API (22)
+   * Android Support Library
+   * Google Repository
+
+3. Install JDK 1.8
+
+Go to:
+
+   http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+
+and install the correct JDK for your OS. At least 1.8 is needed. Nothing more
+should have to be done.
+
+4. Build code
+
+Try to build everything from repository roo with:
+
+   ./gradlew build
+
+Everything should build.
