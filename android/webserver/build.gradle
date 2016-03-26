@@ -2,23 +2,9 @@ apply plugin: 'java'
 
 apply plugin: 'eclipse'
 
-apply plugin: 'application'
-
-
-
-defaultTasks 'hello_world'
-
-task hello_world {
-   doLast {
-      println 'Hello, Gradle!'
-   }
-}
-
-
 repositories {
     mavenCentral()
 }
-
 
 dependencies {
     compile group: 'org.nanohttpd', name: 'nanohttpd', version: '2.2.0' 
@@ -30,16 +16,4 @@ dependencies {
 sourceCompatibility = 8
 
 version = '0.1'
-
-mainClassName = "se.alten.swearc.webserver.dummy.Main"
-
-
-/*
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'Gradle Quickstart',
-                   'Implementation-Version': version
-    }
-}
-*/
 

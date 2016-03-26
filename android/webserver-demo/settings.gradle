@@ -1,0 +1,3 @@
+
+include ':webserver'
+project(':webserver').projectDir = new File(settingsDir, '../webserver')

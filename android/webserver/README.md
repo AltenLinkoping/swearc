@@ -4,23 +4,19 @@
 Distribute program logs with websockets over the net. The solution is currently in a prof-of-concept-state.
 
 
-# How to test
-
-Ther is a prof of concept server with dummy generator for logging.
-
-1. Start dummy log server 
-
-    $ ./runDummyWebServer.sh 
-
-2. Open webpage called logClient.html in browser and see the log messages comming in. 
-
 # Work with
 
 There is a gradle task 'eclipse' to generate a Eclipse project for this project. It uses JUnit and Mockito for testing. It has NanoHTTPD and Java-WebSocket as production code dependencies.  
 
+1. Create eclipse project.
+
+    $ ../../gradlew eclipse
+
+2. In eclipse - import the project as an "existing eclipse project".
+
 
 # How to include into other projects
 
-Explanation to be continued ...
+See how it is done in the [Webserver demo](../webserver-demo/).
 
 
