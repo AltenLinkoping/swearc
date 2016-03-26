@@ -136,6 +136,10 @@ def archive_object_file(object_file) {
 }
 
 def enum_source_files(list, dir) {
+    if (!dir.exists()) {
+       throw new GradleException("Dir " + dir + " does not exist")
+    }
+
     dir.eachFileMatch(~/.*\.c/) {
       list << it
     }
@@ -283,6 +287,11 @@ def enum_includes(file) {
   return result;
 }
 
+def get_basename(filename) {
+  return new File(filename).name.split("\\.", 2)[0]
+
+}
+
 task build << {
     buildDir.mkdirs()
     def sketch_files = []
@@ -290,10 +299,11 @@ task build << {
     def sketch_object_files = []
     def arduino_object_files = []   
     def libraries = []
-    enum_source_files(sketch_files, new File(projectDir, "src"))
+    def src_basedir = get_basename(sketchMainFile)
+    enum_source_files(sketch_files, new File(projectDir, src_basedir))
     enum_source_files(arduino_files, new File("$arduinoCoresDir/$core"))
 
-    def includes = enum_includes(new File(new File(projectDir, "/src"), sketchMainFile))
+    def includes = enum_includes(new File(new File(projectDir, "/" + src_basedir), sketchMainFile))
     includes.each { include ->
       def libdir = new File(librariesDir, include)
       if (libdir.exists() && libdir.isDirectory()) {
