@@ -24,4 +24,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:22.1.0'
     compile 'com.android.support:support-v4:22.1.0'
+    compile group: 'org.nanohttpd', name: 'nanohttpd', version: '2.2.0'
+    compile project(':webserver')
 }
