@@ -22,7 +22,7 @@ ext.arduinoCoresDir = "$arduinoDir/hardware/arduino/avr/cores/"
 ext.arduinoLibDir = "$arduinoDir/hardware/arduino/avr/libraries/"
 ext.arduinoVariantsDir = "$arduinoDir/hardware/arduino/avr/variants/"
 ext.librariesDir = "$arduinoDir/libraries/"
-ext.projectLibrariesDir = "$buildDir/../libraries/"
+ext.projectLibrariesDir = "$buildDir/../../libraries/"
 
 buildscript {
   repositories {

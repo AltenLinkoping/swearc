@@ -3,7 +3,7 @@ include "android:main"
 include "android:main:app"
 include "android:webserver"
 
-include "arduino"
+include "arduino:main"
 
 include "utils:arduino_serial"
 
