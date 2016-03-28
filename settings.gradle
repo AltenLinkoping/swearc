@@ -6,6 +6,6 @@ include "android:webserver"
 include "arduino:main"
 
 include "utils:arduino_serial"
-
+include "utils:gtest"
 
 

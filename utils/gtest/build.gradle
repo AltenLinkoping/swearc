@@ -1,0 +1,65 @@
+apply plugin: 'cpp'
+apply from: 'platform-config.gradle'
+
+def gtest_version = "gtest-1.7.0" // Base name of zip-file
+
+task extractSources(type: Sync) {
+    ext.headerDir = file("src/${gtest_version}/include")
+    ext.sourceDir = file("src/${gtest_version}/")
+    from { zipTree("${gtest_version}.zip") }
+    into "src"
+}
+
+model {
+
+    binaries {
+        all {
+            if (it instanceof SharedLibraryBinarySpec) {
+                cppCompiler.define "GTEST_CREATE_SHARED_LIBRARY", "1"
+            }
+        }
+    }
+
+    components {
+        gtest(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+		        srcDirs "src/${gtest_version}"
+                        include 'src/gtest-all.cc'
+                        generatedBy tasks.extractSources
+                    }
+                    exportedHeaders {
+		        srcDirs "src/${gtest_version}/include", "src/${gtest_version}"
+		    }
+                }
+            }
+        }
+    }
+
+    tasks {
+
+        buildStaticLibs(Task) {
+            dependsOn extractSources, $.binaries.findAll { it.buildable }
+        }
+
+        publish(Copy) {
+            dependsOn buildStaticLibs
+            into "publish"
+            from("src/${gtest_version}/include") {
+                into "include"
+            }
+	    from("build/libs/gtest/static/") {
+                into "lib"
+            }
+        }
+
+        build.dependsOn publish
+
+        clean {
+           delete += "src"
+	   delete += "publish"
+        }
+    }
+
+}

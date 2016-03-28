@@ -5,3 +5,6 @@
 .project
 .settings
 bin
+
+utils/gtest/src/*
+utils/gtest/publish/*
