@@ -1,0 +1,8 @@
+apply plugin: "cpp"
+apply from: "../../utils/gtest/gtest.gradle"
+
+model {
+    components {
+         comm(NativeLibrarySpec)
+    }
+}

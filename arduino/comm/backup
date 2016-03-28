@@ -1,0 +1,46 @@
+apply plugin: "cpp"
+apply plugin: "google-test"
+
+apply from: "../../utils/gtest/platform-config.gradle"
+
+def prebuiltPath = "../../utils/gtest/publish"
+
+def libName(def binary, def name) {
+    binary.targetPlatform.operatingSystem.windows ? "${name}.lib" : "lib${name}.a"
+}
+
+model {
+    binaries {
+        withType(TestSuiteBinarySpec) {
+            lib project: ":utils:gtest", library: "gtest", linkage: "static"
+
+            if (toolChain in Gcc) {
+                linker.args "-pthread"
+            }
+
+            // TODO:DAZ buildable is not being set correctly on test suite binaries
+            if (it.testedBinary.buildable) {
+                println "Adding dependency on $it"
+                // TODO: This should be it.tasks.run, which should use the install image of the test exe
+                unitTest.dependsOn it.namingScheme.getTaskName("run")
+            }
+        }
+    }
+
+    repositories {
+        libs(PrebuiltLibraries) {
+            gtest {
+                headers.srcDir "${prebuiltPath}/include"
+                binaries.withType(StaticLibraryBinary) { binary->
+                    staticLibraryFile = file("${prebuiltPath}/lib/${binary.targetPlatform.name}/${libName(binary, 'gtest')}")
+                }
+            }
+        }
+    }
+
+    components {
+         comm(NativeLibrarySpec)
+    }
+}
+
+task unitTest

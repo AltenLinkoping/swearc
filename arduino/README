@@ -1,3 +1,22 @@
-Place arduino code in src/
+Arduino
+=======
+The following directories exists:
 
-Libraries from 3rd party should be placed in libraries.
+   * robot - Our own code
+   * libraries - Arduino libraries from 3rd party
+   * comm - Our implementation of serial protocol
+
+Attributions
+============
+Gradle build scripts are based on the code from this Github repository:
+
+   https://github.com/jfklingler/gradle-arduino (MIT License)
+
+Minor changes have been made to make it work with changes made in Arduino IDE.
+
+Gtest build scripts have been fetched from here:
+
+   https://github.com/bigdaz/google-test-gradle
+
+LOTS of changes have been made to adjust this script to the new gradle
+project model.
