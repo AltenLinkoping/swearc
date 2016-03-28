@@ -1,49 +1,56 @@
 <html>
-    <head>
-        <title>Log client</title>
-        <style>p {margin: 0em;}</style>
-    </head>
-    <body>
-        <!--<input onkeypress="return keyPress(event, this);"/>-->
-        <div id="output"></div>
-    </body>
-    <script>
-        //var address = "ws://echo.websocket.org/";
-        var address = "ws://127.0.0.1:8889/logger";
-    
-        var websocket = new WebSocket(address);
-    
-        function sendMessage(message) {
-            websocket.send(message);
-            append("<p> SENT: " + message + "</p>");
-        }
-        
-        function keyPress(event,elem ) {
-            if(elem.value) {
-                if (event.keyCode == 13) { 
-                    sendMessage(elem.value); 
-                    elem.value = null; 
-                }
-            }
-        }
-    
-        function append(text) {
-            var output = document.getElementById("output");
-            output.innerHTML = text + output.innerHTML;
-        }
-        
-        websocket.onopen = function() { 
-            append("<p>Connected to address " + address + "</p>"); 
-        };
-        
-        websocket.onmessage = function(evt) {
-            append("<p style=\"color: blue;\"> log: " + evt.data + "</p>"); 
-        };
-        
-        websocket.onerror = function(evt) { 
-            append("<p style=\"color: red;\"> ERROR: " + evt.data + "</p>"); 
-            
-        };
-        
-        </script>
+<head>
+<title>Log client</title>
+<style>
+p {
+	margin: 0em;
+}
+</style>
+</head>
+<body>
+	<!--<input onkeypress="return keyPress(event, this);"/>-->
+	<div id="output"></div>
+</body>
+<script>
+	var address = "ws://127.0.0.1:8889";
+
+	var logSocket = new WebSocket(address + "/log");
+	var commandSocket = new WebSocket(address + "/command");
+
+	function sendMessage(message) {
+		logSocket.send(message);
+		append("<p> SENT: " + message + "</p>");
+	}
+
+	function keyPress(event, elem) {
+		if (elem.value) {
+			if (event.keyCode == 13) {
+				sendMessage(elem.value);
+				elem.value = null;
+			}
+		}
+	}
+
+	function append(text) {
+		var output = document.getElementById("output");
+		output.innerHTML = text + output.innerHTML;
+	}
+
+	logSocket.onopen = function() {
+		append("<p>Connected to address " + address + "</p>");
+	};
+
+	logSocket.onmessage = function(evt) {
+		append("<p style=\"color: blue;\"> log: " + evt.data + "</p>");
+	};
+
+	logSocket.onerror = function(evt) {
+		append("<p style=\"color: red;\"> ERROR: " + evt.data + "</p>");
+
+	};
+	
+	commandSocket.onmessage = function(evt) {
+		append("<p style=\"color: green;\"> log: " + evt.data + "</p>");
+	};
+</script>
 </html>

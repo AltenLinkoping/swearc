@@ -1,48 +1,65 @@
 package se.alten.swearc.webserver;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import se.alten.swearc.logging.LogMessage;
-
 class LogWebsocketServer extends WebSocketServer {
 
-	Collection<WebSocket> loggerSockets = new LinkedList<WebSocket>();
+	private static final ArrayList<WebSocket> EMPTY_LIST = new ArrayList<>();
+	private Map<String, List<WebSocket>> resourceSockets;
 
-	public LogWebsocketServer(int port) throws UnknownHostException {
-		super(new InetSocketAddress(port), Collections
-				.singletonList(new Draft_17()));
+	public LogWebsocketServer(int port, List<String> resources)
+			throws UnknownHostException {
+		super(new InetSocketAddress(port), Arrays.asList(new Draft_17()));
+		initResources(resources);
 
 		InetSocketAddress x = new InetSocketAddress("localhost", port);
-		System.out.println("server up and running on address '"
-				+ x.getAddress() + ":" + x.getPort() + "'");
+		InetAddress address = x.getAddress();
+		println("server running on '" + address + ":" + port + "'");
 	}
 
-	public void sendMessageToAllConnections(LogMessage message) {
+	private void initResources(Iterable<String> resources) {
+		resourceSockets = new HashMap<String, List<WebSocket>>();
+		for (String resource : resources) {
+			resourceSockets.put(resource, new ArrayList<WebSocket>());
+		}
+	}
 
-		loggerSockets.removeIf(s -> !s.isOpen());
-
-		for (WebSocket socket : loggerSockets) {
+	public void sendMessage(String resource, String message) {
+		for (WebSocket socket : getSockets(resource)) {
 			if (socket.isOpen())
-				socket.send(message.getMessage());
+				socket.send(message);
 		}
 	}
 
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
-		System.out.println("Adding new websocket connection from "
-				+ conn.getRemoteSocketAddress().getHostString());
 
-		loggerSockets.add(conn);
+		String resource = asResource(handshake);
 
+		if (isValidResource(resource)) {
+			resourceSockets.get(resource).add(conn);
+			println("Adding new websocket connection from "
+					+ conn.getRemoteSocketAddress().getHostString());
+		} else {
+			println("Socket trying to connect to unknown resource '" + resource
+					+ "'.");
+		}
+	}
+
+	private void println(String localMsg) {
+		System.out.println(localMsg);
 	}
 
 	@Override
@@ -60,6 +77,26 @@ class LogWebsocketServer extends WebSocketServer {
 	@Override
 	public void onError(WebSocket conn, Exception ex) {
 		System.out.println("error: " + ex);
+	}
+
+	private String asResource(ClientHandshake handshake) {
+		String trim = handshake.getResourceDescriptor().trim();
+		return trim.startsWith("/") ? trim.substring(1) : trim;
+	}
+
+	private List<WebSocket> getSockets(String resource) {
+		if (!resourceSockets.containsKey(resource)) {
+			System.out.println("Resource " + resource + " do not exist");
+			return EMPTY_LIST;
+		} else {
+			List<WebSocket> sockets = resourceSockets.get(resource);
+			sockets.removeIf(s -> !s.isOpen());
+			return sockets;
+		}
+	}
+
+	private boolean isValidResource(String resource) {
+		return resourceSockets.containsKey(resource);
 	}
 
 }

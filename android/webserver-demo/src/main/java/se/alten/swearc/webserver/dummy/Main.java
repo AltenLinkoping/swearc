@@ -10,17 +10,30 @@ public class Main {
 	public static void main(String[] args) {
 
 		WebServer.run(server -> {
-			startLogging(server);
+			startRandomLogging(server);
+
+			setControlCommands(server);
+			logReceivedCommands(server);
+
 			blockUntilEnterPress();
 		});
 
 		System.exit(0);
 	}
 
-	private static void startLogging(ServerFunction server) {
+	private static void startRandomLogging(ServerFunction server) {
 		final int logDelaySeconds = 2;
 		RandomLogGenerator generator = new RandomLogGenerator(logDelaySeconds);
 		generator.startLogging(server::broadcastLogMessage);
+	}
+
+	private static void setControlCommands(ServerFunction server) {
+		server.setCommands("FWD", "BACK", "LEFT", "RIGHT");
+	}
+
+	private static void logReceivedCommands(final ServerFunction server) {
+		server.onCommand(command -> server
+				.broadcastLogMessage("Received command " + command));
 	}
 
 	public static void blockUntilEnterPress() {
