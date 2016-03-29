@@ -322,8 +322,16 @@ task build << {
         libraries << libdir
         enum_source_files(arduino_files, libdir)
       }
-
     }
+
+    if (project.hasProperty('arduinoLibs')) {
+      project.arduinoLibs.each { lib ->
+        println "Adding library $lib"
+        def base_path = "$projectDir/../$lib/src/$lib"
+	enum_source_files(arduino_files, new File(base_path, "cpp"))
+	libraries << new File(base_path, "headers")
+      }
+   }
 
     println "Compiling source files"
     sketch_files.each {
