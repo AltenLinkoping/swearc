@@ -2,6 +2,7 @@ include "android:hello"
 include "android:main"
 include "android:main:app"
 include "android:webserver"
+include "android:comm"
 
 include "arduino:main"
 include "arduino:comm"
