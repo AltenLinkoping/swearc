@@ -1,0 +1,13 @@
+apply plugin: 'cpp'
+
+model {
+    binaries {
+        all {
+            linker.args "-pthread"
+        }
+    }
+
+    components {
+        arduino_serial(NativeExecutableSpec) {}
+    }
+}

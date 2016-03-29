@@ -210,7 +210,8 @@ void init_ultrasonic() {
     struct ultrasonic_t* sensor = &ULTRASONIC[i];
     pinMode(sensor->echo_pin, INPUT);
     pinMode(sensor->trigger_pin, OUTPUT);
-    attachInterrupt(digitalPinToInterrupt(sensor->echo_pin), ECHO_INTERRUPTS[i], CHANGE);
+    // TODO: Remove this for now (will be replaced by library soon)
+    //attachInterrupt(digitalPinToInterrupt(sensor->echo_pin), ECHO_INTERRUPTS[i], CHANGE);
   }
   Timer1.initialize(TIMER_US);
   Timer1.attachInterrupt(trigger_pulse);

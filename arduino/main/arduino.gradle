@@ -1,14 +1,23 @@
-//apply from: 'properties.gradle'
-
 import org.gradle.internal.os.OperatingSystem;
 
 if (!project.hasProperty('arduinoDir')) {
    if (OperatingSystem.current().isMacOsX()) {
      ext.arduinoDir = "/Applications/Arduino.app/Contents/Java"
+     ext.arduinoCoresDir = "$arduinoDir/hardware/arduino/avr/cores/"
+     ext.arduinoLibDir = "$arduinoDir/hardware/arduino/avr/libraries/"
+     ext.arduinoVariantsDir = "$arduinoDir/hardware/arduino/avr/variants/"
+
    } else if (OperatingSystem.current().isWindows()) {
      ext.arduinoDir = "C:\\Arduino"
+     ext.arduinoCoresDir = "$arduinoDir/hardware/arduino/avr/cores/"
+     ext.arduinoLibDir = "$arduinoDir/hardware/arduino/avr/libraries/"
+     ext.arduinoVariantsDir = "$arduinoDir/hardware/arduino/avr/variants/"
+
    } else if (OperatingSystem.current().isLinux()) {
-     ext.arduinoDir = "/usr/bin/arduino" // Or is it "/usr/bin/arduino" ?
+     ext.arduinoDir = "/usr/share/arduino"
+     ext.arduinoCoresDir = "$arduinoDir/hardware/arduino/cores/"
+     ext.arduinoLibDir = "$arduinoDir/hardware/arduino/libraries/"
+     ext.arduinoVariantsDir = "$arduinoDir/hardware/arduino/variants/"
    } else {
      throw new GradleException("Unsupported operating system - add it to arduino.gradle")
    }
@@ -18,9 +27,6 @@ if (!file(ext.arduinoDir).exists()) {
    throw new GradleException('Arduino directory does not exist: ' + ext.arduinoDir)
 }
 
-ext.arduinoCoresDir = "$arduinoDir/hardware/arduino/avr/cores/"
-ext.arduinoLibDir = "$arduinoDir/hardware/arduino/avr/libraries/"
-ext.arduinoVariantsDir = "$arduinoDir/hardware/arduino/avr/variants/"
 ext.librariesDir = "$arduinoDir/libraries/"
 ext.projectLibrariesDir = "$buildDir/../../libraries/"
 
