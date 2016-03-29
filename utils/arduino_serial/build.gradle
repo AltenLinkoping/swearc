@@ -1,7 +1,0 @@
-apply plugin: 'cpp'
-
-model {
-  components {
-    arduino_serial(NativeExecutableSpec) {}
-  }
-}
