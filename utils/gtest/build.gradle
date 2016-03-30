@@ -2,11 +2,19 @@ apply plugin: 'cpp'
 apply from: 'platform-config.gradle'
 
 def gtest_version = "gtest-1.7.0" // Base name of zip-file
+def gmock_version = "googlemock-release-1.7.0" // Base name of zip-file
 
-task extractSources(type: Sync) {
+task extractGTest(type: Copy) {
     ext.headerDir = file("src/${gtest_version}/include")
     ext.sourceDir = file("src/${gtest_version}/")
     from { zipTree("${gtest_version}.zip") }
+    into "src"
+}
+
+task extractGMock(type: Copy) {
+    ext.headerDir = file("src/${gmock_version}/include")
+    ext.sourceDir = file("src/${gmock_version}/")
+    from { zipTree("${gmock_version}.zip") }
     into "src"
 }
 
@@ -21,13 +29,14 @@ model {
     }
 
     components {
+
         gtest(NativeLibrarySpec) {
             sources {
                 cpp {
                     source {
 		        srcDirs "src/${gtest_version}"
                         include 'src/gtest-all.cc'
-                        generatedBy tasks.extractSources
+                        generatedBy tasks.extractGTest
                     }
                     exportedHeaders {
 		        srcDirs "src/${gtest_version}/include", "src/${gtest_version}"
@@ -35,31 +44,32 @@ model {
                 }
             }
         }
+
+        gmock(NativeLibrarySpec) {
+            sources {
+                cpp {
+                   lib library: "gtest", linkage: "static"
+                    source {
+		        srcDirs "src/${gmock_version}"
+                        include 'src/gmock-all.cc'
+                        generatedBy tasks.extractGMock
+                    }
+                    exportedHeaders {
+		        srcDirs "src/${gmock_version}/include", "src/${gmock_version}"
+		    }
+                }
+            }
+        }
+
     }
 
     tasks {
-
-        buildStaticLibs(Task) {
-            dependsOn extractSources, $.binaries.findAll { it.buildable }
-        }
-
-        publish(Copy) {
-            dependsOn buildStaticLibs
-            into "publish"
-            from("src/${gtest_version}/include") {
-                into "include"
-            }
-	    from("build/libs/gtest/static/") {
-                into "lib"
-            }
-        }
-
-        build.dependsOn publish
 
         clean {
            delete += "src"
 	   delete += "publish"
         }
+
     }
 
 }
