@@ -23,6 +23,10 @@ model {
 
     binaries {
         all {
+            if (toolChain in Gcc) {
+                cppCompiler.args "-fPIC"
+            }
+
             if (it instanceof SharedLibraryBinarySpec) {
                 cppCompiler.define "GTEST_CREATE_SHARED_LIBRARY", "1"
             }
@@ -49,7 +53,7 @@ model {
         gmock(NativeLibrarySpec) {
             sources {
                 cpp {
-                   lib library: "gtest", linkage: "static"
+                   lib library: "gtest"
                     source {
 		        srcDirs "src/${gmock_version}"
                         include 'src/gmock-all.cc'
