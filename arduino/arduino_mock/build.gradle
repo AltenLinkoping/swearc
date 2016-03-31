@@ -1,0 +1,15 @@
+apply plugin: "cpp"
+apply from: "../../utils/gtest/gtest.gradle"
+
+model {
+    components {
+         arduino_mock(NativeLibrarySpec) {
+             sources {
+                 cpp {
+                     lib project: ":utils:gtest", library: "gtest", linkage: "static"
+                     lib project: ":utils:gtest", library: "gmock", linkage: "static"
+                 }
+             }
+         }
+    }
+}

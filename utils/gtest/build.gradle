@@ -4,17 +4,18 @@ apply from: 'platform-config.gradle'
 def gtest_version = "gtest-1.7.0" // Base name of zip-file
 def gmock_version = "googlemock-release-1.7.0" // Base name of zip-file
 
-task extractGTest(type: Copy) {
-    ext.headerDir = file("src/${gtest_version}/include")
-    ext.sourceDir = file("src/${gtest_version}/")
-    from { zipTree("${gtest_version}.zip") }
-    into "src"
-}
-
 task extractGMock(type: Copy) {
     ext.headerDir = file("src/${gmock_version}/include")
     ext.sourceDir = file("src/${gmock_version}/")
     from { zipTree("${gmock_version}.zip") }
+    into "src"
+}
+
+task extractGTest(type: Copy) {
+    dependsOn extractGMock
+    ext.headerDir = file("src/${gtest_version}/include")
+    ext.sourceDir = file("src/${gtest_version}/")
+    from { zipTree("${gtest_version}.zip") }
     into "src"
 }
 
