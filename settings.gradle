@@ -1,4 +1,3 @@
-include "android:hello"
 include "android:main"
 include "android:main:app"
 include "android:webserver"
