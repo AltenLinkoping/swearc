@@ -1,6 +1,8 @@
 include "android:main"
 include "android:main:app"
+include "android:main:serial-example"
 include "android:webserver"
+include "android:webserver-demo"
 include "android:comm"
 include "android:serial"
 
