@@ -14,6 +14,7 @@ public class Main {
 			blockUntilEnterPress();
 		});
 
+		System.exit(0);
 	}
 
 	private static void startLogging(ServerFunction server) {
