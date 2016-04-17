@@ -39,7 +39,7 @@ class BasicWebServer implements WebServer {
 	@Override
 	public void stop() {
 		try {
-			logger.stop(100);
+			logger.stop(200);
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}

@@ -22,7 +22,7 @@ public class Main {
 			stopRandomLogging();
 		});
 
-		System.exit(0);
+		System.out.println("Bye!");
 	}
 
 	private static void stopRandomLogging() {
@@ -51,6 +51,5 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Bye!");
 	}
 }

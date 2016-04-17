@@ -1,20 +1,19 @@
 package se.alten.swearc.webserver.dummy;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class RandomLogGenerator {
 
 	private final ScheduledExecutorService scheduler = Executors
 			.newScheduledThreadPool(1);
-	private final int delaySeconds;
-	private ScheduledFuture<?> handle;
+	private final int delaySecs;
 
 	public RandomLogGenerator(int delaySeconds) {
-		this.delaySeconds = delaySeconds;
+		this.delaySecs = delaySeconds;
 	}
 
 	public void startLogging(Consumer<String> logger) {
@@ -25,12 +24,10 @@ public class RandomLogGenerator {
 			logger.accept(words);
 		};
 
-		handle = scheduler.scheduleAtFixedRate(runnable, delaySeconds,
-				delaySeconds, TimeUnit.SECONDS);
+		scheduler.scheduleAtFixedRate(runnable, 0, delaySecs, SECONDS);
 	}
 
 	public void stop() {
-		if (handle != null)
-			handle.cancel(false);
+		scheduler.shutdown();
 	}
 }

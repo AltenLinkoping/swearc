@@ -1,5 +1,6 @@
 package se.alten.swearc.webserver;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft_17;
+import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
@@ -18,6 +20,17 @@ class LogWebsocketServer extends WebSocketServer {
 
 	private static final ArrayList<WebSocket> EMPTY_LIST = new ArrayList<>();
 	private Map<String, List<WebSocket>> resourceSockets;
+
+	@Override
+	public void stop(int timeout) throws IOException, InterruptedException {
+		for (String resourceType : resourceSockets.keySet()) {
+			for (WebSocket ws : resourceSockets.get(resourceType)) {
+				ws.close(CloseFrame.GOING_AWAY, "Shutting down!");
+			}
+		}
+
+		super.stop(timeout);
+	}
 
 	public LogWebsocketServer(int port, List<String> resources)
 			throws UnknownHostException {
