@@ -7,6 +7,8 @@ import se.alten.swearc.webserver.WebServer;
 
 public class Main {
 
+	private static RandomLogGenerator generator;
+
 	public static void main(String[] args) {
 
 		WebServer.run(server -> {
@@ -16,14 +18,20 @@ public class Main {
 			logReceivedCommands(server);
 
 			blockUntilEnterPress();
+
+			stopRandomLogging();
 		});
 
 		System.exit(0);
 	}
 
+	private static void stopRandomLogging() {
+		generator.stop();
+	}
+
 	private static void startRandomLogging(ServerFunction server) {
 		final int logDelaySeconds = 2;
-		RandomLogGenerator generator = new RandomLogGenerator(logDelaySeconds);
+		generator = new RandomLogGenerator(logDelaySeconds);
 		generator.startLogging(server::broadcastLogMessage);
 	}
 
