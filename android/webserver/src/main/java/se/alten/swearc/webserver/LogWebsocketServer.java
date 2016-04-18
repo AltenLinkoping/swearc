@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.drafts.Draft_17;
@@ -20,6 +22,8 @@ class LogWebsocketServer extends WebSocketServer {
 
 	private static final ArrayList<WebSocket> EMPTY_LIST = new ArrayList<>();
 	private Map<String, List<WebSocket>> resourceSockets;
+	private BiConsumer<String, String> receiveHook;
+	private Function<String, String> connectHook;
 
 	@Override
 	public void stop(int timeout) throws IOException, InterruptedException {
@@ -65,6 +69,13 @@ class LogWebsocketServer extends WebSocketServer {
 			resourceSockets.get(resource).add(conn);
 			println("Adding new websocket connection from "
 					+ conn.getRemoteSocketAddress().getHostString());
+
+			if (resource != null) {
+				String response = connectHook.apply(resource);
+				if (response != null) {
+					conn.send(response);
+				}
+			}
 		} else {
 			println("Socket trying to connect to unknown resource '" + resource
 					+ "'.");
@@ -84,7 +95,23 @@ class LogWebsocketServer extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		System.out.println("message: " + message);
-		// conn.send(conn.getLocalSocketAddress().toString());
+
+		String resource = isTiedToValidResource(conn);
+		if (resource != null) {
+			receiveHook.accept(resource, message);
+		}
+	}
+
+	private String isTiedToValidResource(WebSocket conn) {
+		for (String resource : resourceSockets.keySet()) {
+			List<WebSocket> sockets = resourceSockets.get(resource);
+
+			if (sockets.contains(conn)) {
+				return resource;
+			}
+
+		}
+		return null;
 	}
 
 	@Override
@@ -110,6 +137,15 @@ class LogWebsocketServer extends WebSocketServer {
 
 	private boolean isValidResource(String resource) {
 		return resourceSockets.containsKey(resource);
+	}
+
+	public void setReceiveHook(BiConsumer<String, String> hook) {
+		this.receiveHook = hook;
+	}
+
+	public void setConnectHook(Function<String, String> hook) {
+		this.connectHook = hook;
+
 	}
 
 }

@@ -16,11 +16,16 @@ class BasicWebServer implements WebServer {
 	private static final List<String> RESOURCES = Arrays.asList(LOG_RESOURCE,
 			COMMAND_RESOURCE);
 
-	LogWebsocketServer logger;
+	private LogWebsocketServer logger;
+
+	private Consumer<String> onCmdHook;
+	private String jsonCommands = null;
 
 	{
 		try {
 			logger = new LogWebsocketServer(PORT, RESOURCES);
+			logger.setReceiveHook(this::onReceive);
+			logger.setConnectHook(this::onConnectResponse);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -47,14 +52,37 @@ class BasicWebServer implements WebServer {
 
 	@Override
 	public void setCommands(String... commands) {
-		// TODO Auto-generated method stub
-		
+		this.jsonCommands = jsonify(commands);
+		logger.sendMessage(COMMAND_RESOURCE, jsonCommands);
+	}
+
+	private String jsonify(String[] commands) {
+		String result = "[";
+
+		for (int i = 0; i < commands.length; i++) {
+			char theEnd = i == commands.length - 1 ? ']' : ',';
+			result += '\"' + commands[i] + '\"' + theEnd;
+		}
+
+		return result;
 	}
 
 	@Override
 	public void onCommand(Consumer<String> onCmdHook) {
-		// TODO Auto-generated method stub
-		
+		this.onCmdHook = onCmdHook;
+
+	}
+
+	private void onReceive(String resource, String command) {
+		if (onCmdHook != null)
+			onCmdHook.accept(command);
+	}
+
+	private String onConnectResponse(String resource) {
+		if (resource.equals(COMMAND_RESOURCE))
+			return jsonCommands;
+		else
+			return null;
 	}
 
 }

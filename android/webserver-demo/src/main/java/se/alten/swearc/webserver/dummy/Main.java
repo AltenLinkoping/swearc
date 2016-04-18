@@ -36,12 +36,12 @@ public class Main {
 	}
 
 	private static void setControlCommands(ServerFunction server) {
-		server.setCommands("FWD", "BACK", "LEFT", "RIGHT");
+		server.setCommands("LEFT", "FWD", "BACK", "RIGHT");
 	}
 
 	private static void logReceivedCommands(final ServerFunction server) {
 		server.onCommand(command -> server
-				.broadcastLogMessage("Received command " + command));
+				.broadcastLogMessage("Robot is going " + command));
 	}
 
 	public static void blockUntilEnterPress() {

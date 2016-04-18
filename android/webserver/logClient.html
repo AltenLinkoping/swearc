@@ -1,13 +1,45 @@
+<!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8" />
 <title>Log client</title>
 <style>
+#output, #command {
+	margin: 1em;
+}
+
+#output {
+	font-size: 0.8em;
+}
+
+#commands {
+	background-color: #eee;
+	padding: 1em
+}
+
 p {
 	margin: 0em;
+}
+
+.printLog {
+	color: blue;
+}
+
+.printCommand {
+	color: green;
+}
+
+.printStatus {
+	font-style: italic;
+	color: gray;
 }
 </style>
 </head>
 <body>
+
+
+	<div id="commands"></div>
+
 	<!--<input onkeypress="return keyPress(event, this);"/>-->
 	<div id="output"></div>
 </body>
@@ -17,40 +49,65 @@ p {
 	var logSocket = new WebSocket(address + "/log");
 	var commandSocket = new WebSocket(address + "/command");
 
-	function sendMessage(message) {
-		logSocket.send(message);
-		append("<p> SENT: " + message + "</p>");
+	function sendCommand(command) {
+
+		print("cmd " + command, "printCommand");
+		commandSocket.send(command);
 	}
 
-	function keyPress(event, elem) {
-		if (elem.value) {
-			if (event.keyCode == 13) {
-				sendMessage(elem.value);
-				elem.value = null;
-			}
+	function displayCommandButton(elem, command) {
+		var button = document.createElement("button");
+		elem.appendChild(button);
+
+		var text = document.createTextNode(command);
+		button.appendChild(text);
+
+		button.onclick = function() {
+			sendCommand(command);
+		};
+	}
+
+	function displayCommandButtons(commandList) {
+		var elem = document.getElementById('commands');
+
+		// clear
+		while (elem.firstChild) {
+			elem.removeChild(elem.firstChild);
+		}
+
+		// add
+		for (var i = 0; i < commandList.length; i++) {
+			displayCommandButton(elem, commandList[i]);
 		}
 	}
 
-	function append(text) {
+	function print(text, cssClass) {
+		cssClass = cssClass || '';
+
 		var output = document.getElementById("output");
-		output.innerHTML = text + output.innerHTML;
+		var p = document.createElement("p");
+		p.appendChild(document.createTextNode(text))
+		p.className = cssClass;
+
+		output.insertBefore(p, output.firstChild);
 	}
 
 	logSocket.onopen = function() {
-		append("<p>Connected to address " + address + "</p>");
+		print("connected to " + logSocket.url, "printStatus");
 	};
 
 	logSocket.onmessage = function(evt) {
-		append("<p style=\"color: blue;\"> log: " + evt.data + "</p>");
+		print("log " + evt.data, "printLog");
 	};
 
-	logSocket.onerror = function(evt) {
-		append("<p style=\"color: red;\"> ERROR: " + evt.data + "</p>");
-
+	logSocket.onclose = function(event) {
+		print("disconnected from " + logSocket.url + ": " + event.reason,
+				"printStatus");
 	};
-	
+
 	commandSocket.onmessage = function(evt) {
-		append("<p style=\"color: green;\"> log: " + evt.data + "</p>");
+		print("commands: " + evt.data, "printCommand");
+		displayCommandButtons(JSON.parse(evt.data));
 	};
 </script>
 </html>
