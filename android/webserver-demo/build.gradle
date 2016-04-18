@@ -12,13 +12,13 @@ dependencies {
     compile project(':android:webserver')
 }
 
-task (runDemo, dependsOn: 'classes', type: JavaExec) {
+task (runWebDemo, dependsOn: 'classes', type: JavaExec) {
     main = 'se.alten.swearc.webserver.dummy.Main'
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }
 
-runDemo.description "Runs the dummy webserver"
+runWebDemo.description "Runs the dummy webserver"
 
 sourceCompatibility = 8
 
