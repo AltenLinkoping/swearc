@@ -42,6 +42,7 @@ import android.widget.TextView;
 import android.widget.TwoLineListItem;
 
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
+import com.hoho.android.usbserial.driver.Ch34xSerialDriver;
 import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
@@ -165,7 +166,8 @@ public class DeviceListActivity extends Activity {
                 SystemClock.sleep(1000);
 
                 final ProbeTable probeTable = new ProbeTable();
-                probeTable.addProduct(0x2a03, 0x42, CdcAcmSerialDriver.class);
+                probeTable.addProduct(0x2a03, 0x42, CdcAcmSerialDriver.class); // Arduino MEGA
+                probeTable.addProduct(0x1A86, 0x7523, Ch34xSerialDriver.class); // USB-to-TTL
                 final List<UsbSerialDriver> drivers =
                         new UsbSerialProber(probeTable).findAllDrivers(mUsbManager);
 
