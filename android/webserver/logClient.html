@@ -36,21 +36,52 @@ p {
 </style>
 </head>
 <body>
-
-
 	<div id="commands"></div>
-
-	<!--<input onkeypress="return keyPress(event, this);"/>-->
 	<div id="output"></div>
 </body>
 <script>
+	function ReconnectWebSocket(address, timeout) {
+		timeout = timeout || 2000;
+
+		var self = this;
+		var socket = undefined;
+
+		self.onopen = function() {
+		};
+		self.onmessage = self.onopen;
+		self.onclose = self.onopen;
+		self.url = address;
+
+		self.connect = function() {
+			socket = new WebSocket(address);
+
+			socket.onopen = function(event) {
+				self.onopen(event);
+			};
+
+			socket.onclose = function(event) {
+				self.onclose(event);
+				window.setTimeout(self.connect, timeout);
+			};
+
+			socket.onmessage = function(event) {
+				self.onmessage(event)
+			};
+		};
+
+		self.send = function(data) {
+			socket.send(data);
+		}
+
+		self.connect();
+	}
+
 	var address = "ws://127.0.0.1:8889";
 
-	var logSocket = new WebSocket(address + "/log");
-	var commandSocket = new WebSocket(address + "/command");
+	var logSocket = new ReconnectWebSocket(address + "/log");
+	var commandSocket = new ReconnectWebSocket(address + "/command");
 
 	function sendCommand(command) {
-
 		print("cmd " + command, "printCommand");
 		commandSocket.send(command);
 	}
@@ -67,15 +98,16 @@ p {
 		};
 	}
 
-	function displayCommandButtons(commandList) {
-		var elem = document.getElementById('commands');
-
-		// clear
+	function clear(elem) {
 		while (elem.firstChild) {
 			elem.removeChild(elem.firstChild);
 		}
+	}
 
-		// add
+	function displayCommandButtons(commandList) {
+		var elem = document.getElementById('commands');
+		clear(elem);
+
 		for (var i = 0; i < commandList.length; i++) {
 			displayCommandButton(elem, commandList[i]);
 		}
@@ -84,25 +116,41 @@ p {
 	function print(text, cssClass) {
 		cssClass = cssClass || '';
 
+		var pad = function(x) {
+			var result = "" + x;
+			while (result.length < 2) {
+				result = '0' + result;
+			}
+			return result;
+		}
+
+		var date = new Date();
+		var timestamp = pad(date.getHours()) + pad(date.getMinutes())
+				+ pad(date.getSeconds());
 		var output = document.getElementById("output");
 		var p = document.createElement("p");
-		p.appendChild(document.createTextNode(text))
+		p.appendChild(document.createTextNode(timestamp + " " + text))
 		p.className = cssClass;
 
 		output.insertBefore(p, output.firstChild);
 	}
 
-	logSocket.onopen = function() {
-		print("connected to " + logSocket.url, "printStatus");
-	};
+	function addConnectionStatusToSocket(socket) {
+		socket.onopen = function() {
+			print("connected to " + socket.url, "printStatus");
+		};
+
+		socket.onclose = function(event) {
+			print("disconnected from " + socket.url + ": " + event.reason,
+					"printStatus");
+		};
+	}
+
+	addConnectionStatusToSocket(logSocket);
+	addConnectionStatusToSocket(commandSocket);
 
 	logSocket.onmessage = function(evt) {
 		print("log " + evt.data, "printLog");
-	};
-
-	logSocket.onclose = function(event) {
-		print("disconnected from " + logSocket.url + ": " + event.reason,
-				"printStatus");
 	};
 
 	commandSocket.onmessage = function(evt) {
