@@ -159,7 +159,7 @@ def enum_source_files(list, dir) {
     }
 
     dir.eachDirRecurse() {
-      if (!it.absolutePath.contains("/examples") && !it.absolutePath.contains("/.svn")) {
+      if (!it.absolutePath.contains("examples") && !it.absolutePath.contains("/.svn")) {
       	enum_source_files(list, it)
       }
     }
@@ -208,7 +208,7 @@ def build_file(file, libraries) {
   libraries.each { library ->
     cmd << "-I${library.absolutePath}"
     library.eachDirRecurse() {
-      if (!it.absolutePath.contains("/examples") && !it.absolutePath.contains("/.svn"))
+      if (!it.absolutePath.contains("examples") && !it.absolutePath.contains("/.svn"))
         cmd << "-I${it.absolutePath}"
     }
   }

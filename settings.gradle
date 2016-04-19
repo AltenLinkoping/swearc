@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 include "android:main"
 include "android:main:app"
 include "android:main:serial-example"
@@ -10,7 +12,9 @@ include "arduino:main"
 include "arduino:comm"
 include "arduino:arduino_mock"
 
-include "utils:arduino_serial"
+if (!OperatingSystem.current().isWindows()){ // TODO: Fix me!
+    include "utils:arduino_serial"
+}
 include "utils:gtest"
 
 

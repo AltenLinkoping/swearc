@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 apply plugin: "google-test"
 
 def prebuiltPath = "publish"
@@ -28,11 +30,21 @@ model {
     toolChains {
         visualCpp(VisualCpp)
         gcc(Gcc)
-        clang(Clang)
+        mingw(Gcc) {
+            path new File("C:/MinGW/bin")
+            target("mingw")
+        }
+        if (OperatingSystem.current().isMacOsX()) {
+            clang(Clang)
+        }
     }
 
     platforms {
         win {
+            operatingSystem "windows"
+            architecture "x86_64"
+        }
+        mingw {
             operatingSystem "windows"
             architecture "x86_64"
         }
@@ -49,8 +61,9 @@ model {
     components {
         all {
             targetPlatform "win"
-	    targetPlatform "osx"
-	    targetPlatform "linux"
+            targetPlatform "mingw"
+            targetPlatform "osx"
+            targetPlatform "linux"
         }
     }
 }

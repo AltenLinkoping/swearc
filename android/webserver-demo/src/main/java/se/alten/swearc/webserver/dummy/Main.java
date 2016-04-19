@@ -7,19 +7,41 @@ import se.alten.swearc.webserver.WebServer;
 
 public class Main {
 
+	private static RandomLogGenerator generator;
+
 	public static void main(String[] args) {
 
 		WebServer.run(server -> {
-			startLogging(server);
+			startRandomLogging(server);
+
+			setControlCommands(server);
+			logReceivedCommands(server);
+
 			blockUntilEnterPress();
+
+			stopRandomLogging();
 		});
 
+		System.out.println("Bye!");
 	}
 
-	private static void startLogging(ServerFunction server) {
+	private static void stopRandomLogging() {
+		generator.stop();
+	}
+
+	private static void startRandomLogging(ServerFunction server) {
 		final int logDelaySeconds = 2;
-		RandomLogGenerator generator = new RandomLogGenerator(logDelaySeconds);
+		generator = new RandomLogGenerator(logDelaySeconds);
 		generator.startLogging(server::broadcastLogMessage);
+	}
+
+	private static void setControlCommands(ServerFunction server) {
+		server.setCommands("LEFT", "FWD", "BACK", "RIGHT");
+	}
+
+	private static void logReceivedCommands(final ServerFunction server) {
+		server.onCommand(command -> server
+				.broadcastLogMessage("Robot is going " + command));
 	}
 
 	public static void blockUntilEnterPress() {
@@ -29,6 +51,5 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Bye!");
 	}
 }

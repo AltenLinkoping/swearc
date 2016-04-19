@@ -1,49 +1,161 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>Log client</title>
-        <style>p {margin: 0em;}</style>
-    </head>
-    <body>
-        <!--<input onkeypress="return keyPress(event, this);"/>-->
-        <div id="output"></div>
-    </body>
-    <script>
-        //var address = "ws://echo.websocket.org/";
-        var address = "ws://127.0.0.1:8889/logger";
-    
-        var websocket = new WebSocket(address);
-    
-        function sendMessage(message) {
-            websocket.send(message);
-            append("<p> SENT: " + message + "</p>");
-        }
-        
-        function keyPress(event,elem ) {
-            if(elem.value) {
-                if (event.keyCode == 13) { 
-                    sendMessage(elem.value); 
-                    elem.value = null; 
-                }
-            }
-        }
-    
-        function append(text) {
-            var output = document.getElementById("output");
-            output.innerHTML = text + output.innerHTML;
-        }
-        
-        websocket.onopen = function() { 
-            append("<p>Connected to address " + address + "</p>"); 
-        };
-        
-        websocket.onmessage = function(evt) {
-            append("<p style=\"color: blue;\"> log: " + evt.data + "</p>"); 
-        };
-        
-        websocket.onerror = function(evt) { 
-            append("<p style=\"color: red;\"> ERROR: " + evt.data + "</p>"); 
-            
-        };
-        
-        </script>
+<head>
+<meta charset="utf-8" />
+<title>Log client</title>
+<style>
+#output, #command {
+	margin: 1em;
+}
+
+#output {
+	font-size: 0.8em;
+}
+
+#commands {
+	background-color: #eee;
+	padding: 1em
+}
+
+p {
+	margin: 0em;
+}
+
+.printLog {
+	color: blue;
+}
+
+.printCommand {
+	color: green;
+}
+
+.printStatus {
+	font-style: italic;
+	color: gray;
+}
+</style>
+</head>
+<body>
+	<div id="commands"></div>
+	<div id="output"></div>
+</body>
+<script>
+	function ReconnectWebSocket(address, timeout) {
+		timeout = timeout || 2000;
+
+		var self = this;
+		var socket = undefined;
+
+		self.onopen = function() {
+		};
+		self.onmessage = self.onopen;
+		self.onclose = self.onopen;
+		self.url = address;
+
+		self.connect = function() {
+			socket = new WebSocket(address);
+
+			socket.onopen = function(event) {
+				self.onopen(event);
+			};
+
+			socket.onclose = function(event) {
+				self.onclose(event);
+				window.setTimeout(self.connect, timeout);
+			};
+
+			socket.onmessage = function(event) {
+				self.onmessage(event)
+			};
+		};
+
+		self.send = function(data) {
+			socket.send(data);
+		}
+
+		self.connect();
+	}
+
+	var address = "ws://127.0.0.1:8889";
+
+	var logSocket = new ReconnectWebSocket(address + "/log");
+	var commandSocket = new ReconnectWebSocket(address + "/command");
+
+	function sendCommand(command) {
+		print("cmd " + command, "printCommand");
+		commandSocket.send(command);
+	}
+
+	function displayCommandButton(elem, command) {
+		var button = document.createElement("button");
+		elem.appendChild(button);
+
+		var text = document.createTextNode(command);
+		button.appendChild(text);
+
+		button.onclick = function() {
+			sendCommand(command);
+		};
+	}
+
+	function clear(elem) {
+		while (elem.firstChild) {
+			elem.removeChild(elem.firstChild);
+		}
+	}
+
+	function displayCommandButtons(commandList) {
+		var elem = document.getElementById('commands');
+		clear(elem);
+
+		for (var i = 0; i < commandList.length; i++) {
+			displayCommandButton(elem, commandList[i]);
+		}
+	}
+
+	function print(text, cssClass) {
+		cssClass = cssClass || '';
+
+		var pad = function(x) {
+			var result = "" + x;
+			while (result.length < 2) {
+				result = '0' + result;
+			}
+			return result;
+		}
+
+		var date = new Date();
+		var timestamp = pad(date.getHours()) + pad(date.getMinutes())
+				+ pad(date.getSeconds());
+		var output = document.getElementById("output");
+		var p = document.createElement("p");
+		p.appendChild(document.createTextNode(timestamp + " " + text))
+		p.className = cssClass;
+
+		output.insertBefore(p, output.firstChild);
+	}
+
+	function addConnectionStatusToSocket(socket) {
+		socket.onopen = function() {
+			print("connected to " + socket.url, "printStatus");
+		};
+
+		socket.onclose = function(event) {
+			print("disconnected from " + socket.url + ": " + event.reason,
+					"printStatus");
+		};
+	}
+
+	addConnectionStatusToSocket(logSocket);
+	addConnectionStatusToSocket(commandSocket);
+
+	logSocket.onmessage = function(evt) {
+		print("log " + evt.data, "printLog");
+	};
+
+	commandSocket.onmessage = function(evt) {
+		print("commands: " + evt.data, "printCommand");
+		displayCommandButtons(JSON.parse(evt.data));
+	};
+</script>
 </html>
