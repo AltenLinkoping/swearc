@@ -24,7 +24,7 @@ public class RandomLogGenerator {
 			logger.accept(words);
 		};
 
-		scheduler.scheduleAtFixedRate(runnable, 0, delaySecs, SECONDS);
+		scheduler.scheduleAtFixedRate(runnable, delaySecs, delaySecs, SECONDS);
 	}
 
 	public void stop() {

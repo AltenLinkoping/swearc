@@ -3,7 +3,7 @@ package se.alten.swearc.webserver.dummy;
 import java.io.IOException;
 
 import se.alten.swearc.webserver.ServerFunction;
-import se.alten.swearc.webserver.WebServer;
+import se.alten.swearc.webserver.WebSocketServer;
 
 public class Main {
 
@@ -11,7 +11,10 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		WebServer.run(server -> {
+		String IP = Util.getMyIP();
+
+		WebSocketServer.run(IP, server -> {
+
 			startRandomLogging(server);
 
 			setControlCommands(server);
@@ -36,7 +39,7 @@ public class Main {
 	}
 
 	private static void setControlCommands(ServerFunction server) {
-		server.setCommands("LEFT", "FWD", "BACK", "RIGHT");
+		server.setCommands("LEFT", "FWD", "BACK", "RIGHT", "nuts");
 	}
 
 	private static void logReceivedCommands(final ServerFunction server) {
@@ -45,7 +48,7 @@ public class Main {
 	}
 
 	public static void blockUntilEnterPress() {
-		System.out.println("Press enter to stop server.");
+		System.out.println("Press enter to stop server.\n");
 		try {
 			System.in.read();
 		} catch (IOException e) {

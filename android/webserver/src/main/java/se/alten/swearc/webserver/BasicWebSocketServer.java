@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-class BasicWebServer implements WebServer {
+class BasicWebSocketServer implements WebSocketServer {
 
 	private static final String COMMAND_RESOURCE = "command";
 	private static final String LOG_RESOURCE = "log";
@@ -16,14 +16,14 @@ class BasicWebServer implements WebServer {
 	private static final List<String> RESOURCES = Arrays.asList(LOG_RESOURCE,
 			COMMAND_RESOURCE);
 
-	private LogWebsocketServer logger;
+	private ResourceGuidedWebsocketServer logger;
 
 	private Consumer<String> onCmdHook;
 	private String jsonCommands = null;
 
 	{
 		try {
-			logger = new LogWebsocketServer(PORT, RESOURCES);
+			logger = new ResourceGuidedWebsocketServer(PORT, RESOURCES);
 			logger.setReceiveHook(this::onReceive);
 			logger.setConnectHook(this::onConnectResponse);
 		} catch (UnknownHostException e) {
@@ -32,8 +32,9 @@ class BasicWebServer implements WebServer {
 	}
 
 	@Override
-	public void start() {
+	public int start() {
 		logger.start();
+		return PORT;
 	}
 
 	@Override
