@@ -40,7 +40,7 @@ class WebClientServingSocketServer implements WebSocketServer {
 		webServer = FixedRespWebServer.startTryPorts(webResponse);
 
 		System.out.println();
-		System.out.println("WebSocket are on port " + wsPort);
+		System.out.println("WebSockets are on port " + wsPort);
 		System.out.println("Point your browers to http://" + wsIp + ":"
 				+ webServer.getListeningPort() + "");
 
